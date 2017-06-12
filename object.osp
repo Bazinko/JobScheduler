@@ -1,0 +1,141 @@
+prompt Creating type TObject ...
+create or replace type TObject force as object
+(
+/************************************************************************
+ * Корневой тип в иерархии классов PL/Job                               *
+ *                                                                      *
+ * Является предком для всех классов PL/Job                             *
+ *                                                                      *
+ * @file    object.osp                                                  *
+ * @author  Evgeny Sergeev                                              *
+ * @version 1.0.0                                                       *
+ * @history                                                             *
+ * Evgeny Sergeev 24.04.2017 - created                                  *
+ ************************************************************************
+ * Copyright (c) 2017 Evgeny Sergeev                                    *
+ * email: Bazinko@yandex.ru                                             *
+ ***********************************************************************/
+
+  FGUID raw(16),
+       
+
+ /**
+  * Функция возвращает имя экземпляра типа
+  *
+  * @return Тип экземпляра объекта в виде строки
+  */
+  member function  getTypeName                                  return varchar2,
+
+
+ /**
+  * Функция возвращает тип экземпляра в виде объекта AnyType
+  *
+  * @return Тип экземпляра в виде объекта AnyType
+  */
+  member function  getAnyType                                   return AnyType,
+
+
+ /**
+  * Функция возвращает экземпляр объекта в виде объекта AnyData
+  *
+  * @return Экземпляр типа в виде объекта AnyData
+  */
+  member function  getAnyData                                   return AnyData,
+
+
+ /**
+  * Функция возвращает имя типа предка для данного экземпляра
+  *
+  * @return Экземпляр типа в виде объекта AnyData
+  */
+  member function  getSuperTypeName(v_pTypeName in varchar2 := null) 
+                                                                return varchar2,
+
+
+ /**
+  * Функция возвращает строковое представление объекта 
+  *
+  * @return Значение объекта в виде строки
+  */
+  member function  getString                                    return varchar2,
+
+
+ /**
+  * Функция возвращает целочисленное представление объекта 
+  *
+  * @return Значение объекта в виде целого числа
+  */
+  member function  getInteger                                return pls_integer,
+
+
+ /**
+  * Функция производит сравнение двух объектов.
+  * ВНИМАНИЕ: именно эта функция перегружается для возможности сравнения 
+  *   объектов!
+  *
+  * @param v_pObject - объект с которым происходит сравнение
+  * @return 0, если объекты равны,<br> 1 - если текущий объект больше, 
+  *           чем v_pObject<br>, -1 - если текущий объект меньше, чем v_pObject
+  */
+  member function compareObject(v_pObject in TObject)        return pls_integer,
+
+
+ /**
+  * Функция производит перегрузку оператора сравнения, работает с помощью вызова
+  *   метода compareObject
+  *
+  * @param v_pObject - объект с которым происходит сравнение
+  * @return 0, если объекты равны,<br> 1 - если текущий объект больше, 
+  *            чем v_pObject<br>, -1 - если текущий объект меньше, чем v_pObject
+  */
+  order member function compare(v_pObject in TObject)        return pls_integer,
+
+
+ /**
+  * Деструктор экземпляра
+  *
+  */
+  member procedure finalyze(self in out nocopy TObject),
+
+
+ /**
+  * Процедура производит очистку объекта (присвоение всем атрибутам NULL).
+  *
+  */
+  member procedure clear(self in out nocopy TObject),
+
+
+ /**
+  * Функция для определения факта наследования класса от текущего класса 
+  *
+  * @param v_pType - класс,
+  * @return TRUE - если класс v_pType унаследован от текущего класса, 
+  *         FALSE - в противном случае
+  */
+  member function InheritsFrom(v_pType in AnyType)                   return boolean,
+
+ /**
+  * Функция для определения факта наследования класса от текущего класса 
+  *
+  * @param v_pTypeName - имя класса,
+  * @return TRUE - если класс v_pTypeName унаследован от текущего класса, 
+            FALSE - в противном случае
+  */
+  member function InheritsFrom(v_pTypeName in varchar2)              return boolean,
+
+
+ /**
+  * Функция создает и возвращает экземпляр своего класса
+  *
+  * @return экземпляр текущего класса
+  */
+  static function newInstance                                        return TObject
+
+)
+not final;
+/
+show errors;
+
+prompt Done
+prompt 
+

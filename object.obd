@@ -1,0 +1,170 @@
+prompt Creating type body TObject ...
+create or replace type body TObject is
+/************************************************************************
+ * Корневой тип в иерархии классов PL/Job                               *
+ *                                                                      *
+ * Является предком для всех классов PL/Job                             *
+ *                                                                      *
+ * @file    object.obd                                                  *
+ * @author  Evgeny Sergeev                                              *
+ * @version 1.0.0                                                       *
+ * @history                                                             *
+ * Evgeny Sergeev 24.04.2017 - created                                  *
+ ************************************************************************
+ * Copyright (c) 2017 Evgeny Sergeev                                    *
+ * email: Bazinko@yandex.ru                                             *
+ ***********************************************************************/
+
+  member function  getTypeName                               return varchar2 is
+    v_xAnyData AnyData;
+    v_xPos     pls_integer;
+    v_xRes     varchar2(128);     
+  begin
+    v_xAnyData := AnyData.ConvertObject(self);
+    v_xRes     := v_xAnyData.getTypeName;
+
+    v_xPos := instr(v_xRes,'.');
+    v_xRes := substr(v_xRes,v_xPos+1);
+
+    return v_xRes;
+  end;
+
+
+  member function  getAnyType                                 return AnyType is
+    v_xAnyData AnyData := self.getAnyData;
+  begin
+    return AnyType.GetPersistent(USER,v_xAnyData.getTypeName);
+  end;
+
+
+  member function  getAnyData                                 return AnyData is
+    v_xRes AnyData;
+  begin
+    v_xRes := AnyData.ConvertObject(self);
+
+    return v_xRes;
+  end;
+
+
+  member function  getSuperTypeName(v_pTypeName in varchar2 := null) 
+                                                             return varchar2 is
+    v_xRes varchar2(64);     
+  begin
+    select
+      supertype_name
+    into
+      v_xRes
+    from
+      user_types
+    where
+      type_name = nvl2(v_pTypeName,self.getTypeName,v_pTypeName);
+
+    return v_xRes;
+  end;
+
+
+  member function  getString                                 return varchar2 is
+  begin
+    return null;
+  end;
+
+
+
+  member function  getInteger                             return pls_integer is
+  begin
+    return null;
+  end;
+
+
+  member function compareObject(v_pObject in TObject)     return pls_integer is
+  begin
+    if self.getInteger = v_pObject.getInteger then 
+      return 0;
+    end if;
+
+    if self.getInteger > v_pObject.getInteger then 
+      return 1;
+    end if;
+
+    return -1;
+  end;
+
+
+
+  order member function compare(v_pObject in TObject)     return pls_integer is
+  begin
+    return compareObject(v_pObject);
+  end;
+
+
+  member procedure finalyze(self in out nocopy TObject) is
+  begin
+    null;
+  end;
+
+
+  member procedure clear(self in out nocopy TObject) is
+  begin
+    FGUID := null;
+  end;
+
+
+  member function InheritsFrom(v_pType in AnyType)            return boolean is
+   v_xPrec        pls_integer;             
+   v_xScale       pls_integer;             
+   v_xLen         pls_integer;             
+   v_xCsid        pls_integer;             
+   v_xCsfrm       pls_integer;             
+   v_xSchema_Name varchar2(32);                
+   v_xType_Name   varchar2(32);                
+   v_xVersion     varchar2(32);                
+   v_xNumElems    pls_integer;             
+   v_xRes         pls_integer;
+  begin
+    v_xRes := v_pType.getInfo(v_xPrec,       
+                              v_xScale,      
+                              v_xLen,        
+                              v_xCsid,       
+                              v_xCsfrm,      
+                              v_xSchema_Name,
+                              v_xType_Name,  
+                              v_xVersion,    
+                              v_xNumElems);   
+
+    return self.InheritsFrom(v_pTypeName => v_xType_Name);
+  end;
+
+
+  member function InheritsFrom(v_pTypeName in varchar2)       return boolean is
+    v_xTypeName      constant varchar2(32) := self.getTypeName();
+    v_xSuperTypeName          varchar2(32);
+  begin
+    select
+      ut.supertype_name
+    into
+      v_xSuperTypeName
+    from
+      user_types ut
+    where
+      ut.type_name = v_xTypeName;
+
+    return (v_xsuperTypeName = v_pTypeName);
+      
+  exception
+    when no_data_found then 
+      return false;
+  end;
+
+
+  static function newInstance                                 return TObject is
+    v_xRes TObject;
+  begin
+    v_xRes := new TObject(FGUID => sys_guid);
+  end;
+
+
+end;
+/
+show errors;
+
+prompt Done

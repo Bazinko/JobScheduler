@@ -1,0 +1,37 @@
+prompt Creating type TPersistent ...
+
+create or replace type TPersistent force under TObject 
+(
+/************************************************************************
+ * Абстрактный персистентный тип PL/Job                                 *
+ *                                                                      *                             
+ *                                                                      *
+ * @file    persistent.osp                                              *
+ * @author  Evgeny Sergeev                                              *
+ * @version 1.0.0                                                       *
+ * @history                                                             *
+ * Evgeny Sergeev 24.04.2017 - created                                *
+ ************************************************************************
+ * Copyright (c) 2017 Evgeny Sergeev                                    *
+ * email: Bazinko@yandex.ru                                             *
+ ***********************************************************************/  
+
+  /*Имя объекта */  
+  FName varchar2(128 char),
+
+  /** Состояние объекта: "TRUE" - включен, "FALSE" - выключен */
+  FEnabled   varchar2(5),
+
+  /*Комментарий к объекту */
+  FComment varchar2(4000),
+
+  member procedure save(self in out nocopy TPersistent),
+
+  member procedure remove(self in out nocopy TPersistent)
+
+)
+not final;
+/
+show errors;
+
+prompt Done

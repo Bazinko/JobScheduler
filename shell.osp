@@ -1,0 +1,45 @@
+prompt Creating type TOracleJobShellScript ...
+create or replace type TOracleJobShellScript force under TOracleJob
+(
+/************************************************************************
+ * Задание PL/Job представленное в виде shell-скрипта ОС                *
+ *                                                                      *                             
+ *                                                                      *
+ * @file    shell.osp                                                     *
+ * @author  Evgeny Sergeev                                              *
+ * @version 1.0.0                                                       *
+ * @history                                                             *
+ * Evgeny Sergeev 24.04.2017 - created                                  *
+ ************************************************************************
+ * Copyright (c) 2017 Evgeny Sergeev                                    *
+ * email: Bazinko@yandex.ru                                             *
+ ***********************************************************************/  
+
+  /* Объект учетной записи пользователя ОС, под которым будет выполняться
+    shell-скрипт */
+  FCredential TOracleJobCredential,
+
+  /*Конструктор - процедура для создания задания*/
+  constructor function TOracleJobShellScript(v_pName           in varchar2,      
+                                             v_pShellScript    in varchar2,       
+                                             v_pCredential     in TOracleJobCredential,
+                                             v_pStartDate      in date     := sysdate,
+                                             v_pEndDate        in date     := null, 
+                                             v_pRepeatInterval in varchar2 := 'freq=daily',                                           
+                                             v_pEnabled        in boolean  := true,
+                                             v_pJob_class      in varchar2 := null,               
+                                             v_pAuto_drop      in boolean  := false,
+                                             v_pComments       in varchar2 := null)  return self as result,
+
+  /*Конструктор - процедура для чтений уже существующего задания*/
+  constructor function TOracleJobShellScript(v_pName in varchar2)  return self as result,
+
+  overriding member procedure save(self in out nocopy TOracleJobShellScript)
+
+)
+not final;
+/
+show errors;
+
+prompt Done
+

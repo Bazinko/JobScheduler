@@ -1,0 +1,47 @@
+prompt Creating type TOracleJobProgram ...
+create or replace type TOracleJobProgram force under TPersistent 
+(
+/************************************************************************
+ * Программа задания PL/Job                                             *
+ *                                                                      *                             
+ * @file    program.osp                                                 *
+ * @author  Evgeny Sergeev                                              *
+ * @version 1.0.0                                                       *
+ * @history                                                             *
+ * Evgeny Sergeev 24.05.2017 - created                                  *
+ ************************************************************************
+ * Copyright (c) 2017 Evgeny Sergeev                                    *
+ * email: Bazinko@yandex.ru                                             *
+ ***********************************************************************/  
+  
+  /** Тип задания:  'PLSQL_BLOCK', 'STORED_PROCEDURE', 'EXECUTABLE' */
+  FType               varchar2(16),  
+
+  /* Выполняемая команда задания */
+  FAction             varchar2(4000),
+
+  /* Число аргументов задания */
+  FNumberOfArguments  integer,   
+
+  /* Конструктор - процедура для создания программы */
+  constructor function TOracleJobProgram(v_pName              in varchar2,      
+                                         v_pType              in varchar2,      
+                                         v_pAction            in varchar2, 
+                                         v_pNumberOfArguments in integer  := 0,     
+                                         v_pEnabled           in boolean  := true,
+                                         v_pComments          in varchar2 := null)  return self as result,
+
+  /* Конструктор - процедура для чтения уже существующей программы */
+  constructor function TOracleJobProgram(v_pName in varchar2)  return self as result,
+
+  overriding member procedure save(self in out nocopy TOracleJobProgram),
+
+  overriding member procedure remove(self in out nocopy TOracleJobProgram)
+
+)
+not final;
+/
+show errors;
+
+prompt Done
+

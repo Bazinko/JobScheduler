@@ -1,0 +1,34 @@
+prompt Creating type body TPersistent ...
+
+create or replace type body TPersistent is
+
+/************************************************************************
+ * Абстрактный персистентный тип PL/Job                                 *
+ *                                                                      *                             
+ *                                                                      *
+ * @file    persistent.obd                                              *
+ * @author  Evgeny Sergeev                                              *
+ * @version 1.0.0                                                       *
+ * @history                                                             *
+ * Evgeny Sergeev 24.04.2017 - created                                  *
+ ************************************************************************
+ * Copyright (c) 2017 Evgeny Sergeev                                    *
+ * email: Bazinko@yandex.ru                                             *
+ ***********************************************************************/  
+  member procedure save(self in out nocopy TPersistent) is
+  begin
+    null;
+  end;
+
+
+  member procedure remove(self in out nocopy TPersistent) is
+  begin
+    null;
+  end;
+
+end;
+
+/
+show errors;
+
+prompt Done

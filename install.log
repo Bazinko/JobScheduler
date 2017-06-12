@@ -1,0 +1,101 @@
+
+Procedure created.
+
+No errors.
+
+Function created.
+
+No errors.
+
+Function created.
+
+No errors.
+
+Function created.
+
+No errors.
+
+Function created.
+
+No errors.
+
+Function created.
+
+No errors.
+
+Function created.
+
+No errors.
+
+Function created.
+
+No errors.
+
+Function created.
+
+No errors.
+
+Function created.
+
+No errors.
+Creating type TObject ...
+
+Type created.
+
+No errors.
+Done
+
+Creating type body TObject ...
+
+Type body created.
+
+No errors.
+Done
+Creating type TPersistent ...
+
+Type created.
+
+No errors.
+Done
+Creating type body TPersistent ...
+
+Type body created.
+
+No errors.
+Done
+Creating type TOracleJobProgram ...
+
+Type created.
+
+No errors.
+Done
+Creating type body TOracleJobProgram ...
+
+Type body created.
+
+No errors.
+Done
+Creating type TOracleJobCredential ...
+
+Type created.
+
+No errors.
+Done
+Creating type body TOracleJobCredential ...
+
+Type body created.
+
+No errors.
+Done
+Creating type TOracleJob ...
+
+Type created.
+
+No errors.
+Done
+Creating type TOracleJob ...
+
+Type body created.
+
+No errors.
+Done

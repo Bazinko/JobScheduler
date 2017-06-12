@@ -1,0 +1,134 @@
+prompt Creating type TOracleJob ...
+
+create or replace type body TOracleJob is 
+/************************************************************************
+ * Задание PL/Job                                                       *
+ *                                                                      *                             
+ *                                                                      *
+ * @file    job.obd                                                     *
+ * @author  Evgeny Sergeev                                              *
+ * @version 1.0.0                                                       *
+ * @history                                                             *
+ * Evgeny Sergeev 24.04.2017 - created                                  *
+ ************************************************************************
+ * Copyright (c) 2017 Evgeny Sergeev                                    *
+ * email: Bazinko@yandex.ru                                             *
+ ***********************************************************************/  
+  constructor function TOracleJob(v_pName              in varchar2,      
+                                  v_pType              in varchar2,      
+                                  v_pAction            in varchar2,       
+                                  v_pStartDate         in date     := sysdate,
+                                  v_pEndDate           in date     := null, 
+                                  v_pRepeatInterval    in varchar2 := 'freq=daily',                                           
+                                  v_pEnabled           in boolean  := true,
+                                  v_pJob_class         in varchar2 := null,               
+                                  v_pAuto_drop         in boolean  := false,              
+                                  v_pCredential_name   in varchar2 := null,               
+                                  v_pDestination_name  in varchar2 := null,
+                                  v_pNumberOfArguments in integer  := 0,              
+                                  v_pComments          in varchar2 := null)  return self as result is
+  begin
+    self.FName              :=  v_pName;          
+    self.FType              :=  v_pType;          
+    self.FAction            :=  v_pAction;        
+    self.FStartDate         :=  v_pStartDate;     
+    self.FEndDate           :=  v_pEndDate;       
+    self.FRepeatInterval    :=  v_pRepeatInterval;
+    self.FEnabled           :=  BooleanToStr(v_pEnabled);
+    self.FComment           :=  trim(v_pComments);
+    self.FNumberOfArguments := v_pNumberOfArguments;
+
+    return;
+  end;
+
+  constructor function TOracleJob(v_pName in varchar2)  return self as result is
+    v_xJob user_scheduler_jobs%rowtype;
+  begin
+    select
+      *
+    into
+      v_xJob
+    from   
+      user_scheduler_jobs uj
+    where
+      uj.job_name = upper(trim(v_pName));
+
+    self.FName           :=  v_pName;          
+    self.FType           :=  v_xJob.Job_Type;          
+    self.FAction         :=  v_xJob.Job_Action;        
+    self.FStartDate      :=  v_xJob.Start_Date;     
+    self.FEndDate        :=  v_xJob.End_Date;       
+    self.FRepeatInterval :=  v_xJob.Repeat_Interval;
+    self.FEnabled        :=  v_xJob.Enabled;
+    self.FComment        :=  v_xJob.Comments;
+
+    return;
+  end;
+
+
+  member procedure disable(self in out nocopy TOracleJob) is
+  begin
+    self.FEnabled := 'FALSE'; 
+    dbms_scheduler.disable(name => self.FName);
+  end;
+
+
+  member procedure run(self in out nocopy TOracleJob) is
+  begin
+    dbms_scheduler.run_job(job_name => self.FName);
+  end;
+
+  
+  member procedure stop(self in out nocopy TOracleJob) is
+  begin
+    dbms_scheduler.stop_job(job_name => self.FName);
+  end;
+
+
+  member procedure scheduling(self in out nocopy TOracleJob) is
+  begin
+    null;
+  end;
+
+
+  overriding member procedure save(self in out nocopy TOracleJob) is
+  begin
+    (self as TPersistent).save;
+
+    dbms_scheduler.create_job(job_name            => self.FName,          
+                       	      job_type            => self.FType,          
+		              job_action          => self.FAction,        
+		              start_date          => self.FStartDate,     
+		              repeat_interval     => self.FRepeatInterval,       
+		              enabled             => StrToBoolean(self.FEnabled),
+                              number_of_arguments => self.FNumberOfArguments,       
+		              comments            => self.FComment);            
+    commit;
+  end;                                           
+
+
+  overriding member procedure remove(self in out nocopy TOracleJob) is
+  begin
+    dbms_scheduler.drop_job(job_name => self.FName);
+
+    (self as TPersistent).remove;
+
+    commit;
+  end;
+
+
+  member procedure setPrimaryRole(self in out nocopy TOracleJob) is 
+  begin
+  --Джоб будет выполняться только если БД является основной (Primary-DB)
+    dbms_scheduler.set_attribute(name      => self.FName,
+                                 attribute => 'database_role',
+                                 value     => 'PRIMARY');
+    commit;
+  end;
+
+end;
+
+/
+show errors;
+
+prompt Done

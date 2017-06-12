@@ -1,0 +1,82 @@
+prompt Creating type TOracleJob ...
+create or replace type TOracleJob force under TPersistent 
+(
+/************************************************************************
+ * Задание PL/Job                                                       *
+ *                                                                      *                             
+ *                                                                      *
+ * @file    job.osp                                                     *
+ * @author  Evgeny Sergeev                                              *
+ * @version 1.0.0                                                       *
+ * @history                                                             *
+ * Evgeny Sergeev 24.02.2017 - created                                  *
+ ************************************************************************
+ * Copyright (c) 2017 Evgeny Sergeev                                    *
+ * email: Bazinko@yandex.ru                                             *
+ ***********************************************************************/  
+
+  /* Тип задания */
+  FType varchar2(20), 
+
+  /*Действие задания*/
+  FAction varchar2(4000),
+
+  /*Дата старта работы задания*/
+  FStartDate timestamp(6) with time zone,
+
+  /*Дата окончания работы задания*/
+  FEndDate timestamp(6) with time zone,
+
+  /** Интервал повторения задания */
+  FRepeatInterval varchar2(20),
+
+  /*Количество повторений задания*/
+  FDuration integer,
+
+  /*Количество аргументов задания */
+  FNumberOfArguments integer,
+
+  /*Конструктор - процедура для создания задания*/
+  constructor function TOracleJob(v_pName              in varchar2,      
+                                  v_pType              in varchar2,      
+                                  v_pAction            in varchar2,       
+                                  v_pStartDate         in date     := sysdate,
+                                  v_pEndDate           in date     := null, 
+                                  v_pRepeatInterval    in varchar2 := 'freq=daily',                                           
+                                  v_pEnabled           in boolean  := true,
+                                  v_pJob_class         in varchar2 := null,               
+                                  v_pAuto_drop         in boolean  := false,              
+                                  v_pCredential_name   in varchar2 := null,               
+                                  v_pDestination_name  in varchar2 := null,
+                                  v_pNumberOfArguments in integer  := 0,              
+                                  v_pComments          in varchar2 := null)  return self as result,
+
+  /*Конструктор - процедура для чтений уже существующего задания*/
+  constructor function TOracleJob(v_pName           in varchar2)  return self as result,
+
+  /*Процедура для запуска задания*/
+  member procedure run(self in out nocopy TOracleJob),
+
+  /*Процедура для остановки задания*/
+  member procedure stop(self in out nocopy TOracleJob),
+
+  /*Процедура для отключения задания*/
+  member procedure disable(self in out nocopy TOracleJob),
+
+
+  /*Процедура задаёт дату планирования старта для задания*/
+  member procedure scheduling(self in out nocopy TOracleJob),
+
+  overriding member procedure save(self in out nocopy TOracleJob),
+
+  overriding member procedure remove(self in out nocopy TOracleJob),
+
+  member procedure setPrimaryRole(self in out nocopy TOracleJob)
+
+)
+not final;
+/
+show errors;
+
+prompt Done
+

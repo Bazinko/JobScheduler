@@ -1,0 +1,85 @@
+prompt Creating type body TOracleJobProgram ...
+create or replace type body TOracleJobProgram is 
+/************************************************************************
+ * Тело типа программы задания PL/Job                                   *
+ *                                                                      *                             
+ * @file    program.obd                                                 *
+ * @author  Evgeny Sergeev                                              *
+ * @version 1.0.0                                                       *
+ * @history                                                             *
+ * Evgeny Sergeev 24.05.2017 - created                                  *
+ ************************************************************************
+ * Copyright (c) 2017 Evgeny Sergeev                                    *
+ * email: Bazinko@yandex.ru                                             *
+ ***********************************************************************/  
+
+  constructor function TOracleJobProgram(v_pName              in varchar2,      
+                                         v_pType              in varchar2,      
+                                         v_pAction            in varchar2, 
+                                         v_pNumberOfArguments in integer  := 0,     
+                                         v_pEnabled           in boolean  := true,
+                                         v_pComments          in varchar2 := null)  return self as result is
+  begin
+    self.FName              := v_pName;             
+    self.FType              := v_pType;             
+    self.FAction            := v_pAction;           
+    self.FEnabled           := BooleanToStr(v_pEnabled);
+    self.FNumberOfArguments := v_pNumberOfArguments;                
+    self.FComment           := v_pComments;         
+
+    return;
+  end;
+
+
+  constructor function TOracleJobProgram(v_pName in varchar2)  return self as result is
+    v_xProgram user_scheduler_programs%rowtype;
+  begin
+    select
+      *
+    into
+      v_xProgram
+    from
+      user_scheduler_programs up
+    where
+      up.program_name=upper(trim(v_pName));
+
+    self.FName              := v_xProgram.program_name;
+    self.FType              := v_xProgram.program_type;
+    self.FAction            := v_xProgram.program_action;
+    self.FEnabled           := v_xProgram.Enabled;
+    self.FNumberOfArguments := v_xProgram.Number_Of_Arguments;
+    self.FComment           := v_xProgram.Comments;
+
+    return;
+  end;
+
+
+  overriding member procedure save(self in out nocopy TOracleJobProgram) is
+  begin
+    (self as TPersistent).save;
+
+    dbms_scheduler.create_program(program_name        => self.FName,
+                                  program_type        => self.FType,  
+                                  program_action      => self.FAction,
+                                  number_of_arguments => self.FNumberOfArguments,
+                                  enabled             => StrToBoolean(self.FEnabled),
+                                  comments            => self.FComment);
+    commit;
+  end;
+
+
+  overriding member procedure remove(self in out nocopy TOracleJobProgram) is
+  begin
+    dbms_scheduler.drop_program(program_name => self.FName);
+
+    (self as TPersistent).remove;
+
+    commit;
+  end;
+
+
+end;
+/
+show errors;
+
+prompt Done
